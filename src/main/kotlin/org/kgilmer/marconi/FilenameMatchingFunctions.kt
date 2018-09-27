@@ -5,12 +5,14 @@ import java.io.File
 
 fun searchFilenameForTrackMatch(input: Triple<String, String, String>): List<Map<FieldKey, String>> =
         listOf<(Triple<String, String, String>) -> Map<FieldKey, String>?>(
-                ::matchArtistAlbumDiscIndexTitle,
-                ::matchArtistAlbumIndexTitle,
-                ::matchNoneArtistAlbumDateIndexTitle,
-                ::matchNoneArtistAlbumIndexTitle,
-                ::matchNoneArtistAlbumIndexTrackArtistTitle,
-                ::matchArtistAlbumIndexTrackArtistTitle).mapNotNull { it.invoke(input) }
+            ::matchArtistAlbumDiscIndexTitle,
+            ::matchArtistAlbumIndexTitle,
+            ::matchNoneArtistAlbumDateIndexTitle,
+            ::matchNoneArtistAlbumIndexTitle,
+            ::matchNoneArtistAlbumIndexTrackArtistTitle,
+            ::matchArtistAlbumIndexTrackArtistTitle,
+            ::matchArtistYearAlbumTrackIndexTrackTitle
+        ).mapNotNull { it.invoke(input) }
 
 fun matchArtistAlbumIndexTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
         matchPattern(input,
@@ -72,6 +74,16 @@ fun matchArtistAlbumDiscIndexTitle(input: Triple<String, String, String>): Map<F
                         FieldKey.DISC_NO to 3,
                         FieldKey.TRACK to 4,
                         FieldKey.TITLE to 5))
+
+// Bob Marley - Complete Discography From 1967 To 2002 [33 Full Albums] (Mp3 256Kbps)/Bob Marley - 1979 - Live From Kingston/02 - Positive Vibration.mp3
+fun matchArtistYearAlbumTrackIndexTrackTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
+        matchPattern(input,
+                listOf("^(.*)-##-(.*)-(.*)-(.*)-##-(\\d{2}) -(.*).mp3"),
+                listOf(FieldKey.ARTIST to 2,
+                        FieldKey.ALBUM to 4,
+                        FieldKey.YEAR to 3,
+                        FieldKey.TRACK to 5,
+                        FieldKey.TITLE to 6))
 
 private fun matchPattern(input: Triple<String, String, String>, regExpressions: List<String>, fieldKeyRegexGroupMapping: List<Pair<FieldKey, Int>>, filePathSeparator: String = "-##-"): Map<FieldKey, String>? {
     require(regExpressions.isNotEmpty(), { "Must supply at least one regex." })

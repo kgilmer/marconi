@@ -3,18 +3,20 @@ package org.kgilmer.marconi
 import org.jaudiotagger.tag.FieldKey
 import java.io.File
 
-fun searchFilenameForTrackMatch(input: Triple<String, String, String>): List<Map<FieldKey, String>> =
-        listOf<(Triple<String, String, String>) -> Map<FieldKey, String>?>(
-            ::matchArtistAlbumDiscIndexTitle,
-            ::matchArtistAlbumIndexTitle,
-            ::matchNoneArtistAlbumDateIndexTitle,
-            ::matchNoneArtistAlbumIndexTitle,
-            ::matchNoneArtistAlbumIndexTrackArtistTitle,
-            ::matchArtistAlbumIndexTrackArtistTitle,
-            ::matchArtistYearAlbumTrackIndexTrackTitle
+typealias TrackMatch = Map<FieldKey, String>
+
+fun searchFilenameForTrackMatch(input: Triple<String, String, String>): List<TrackMatch> =
+        listOf<(Triple<String, String, String>) -> TrackMatch?>(
+                ::matchArtistAlbumDiscIndexTitle,
+                ::matchArtistAlbumIndexTitle,
+                ::matchNoneArtistAlbumDateIndexTitle,
+                ::matchNoneArtistAlbumIndexTitle,
+                ::matchNoneArtistAlbumIndexTrackArtistTitle,
+                ::matchArtistAlbumIndexTrackArtistTitle,
+                ::matchArtistYearAlbumTrackIndexTrackTitle
         ).mapNotNull { it.invoke(input) }
 
-fun matchArtistAlbumIndexTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
+fun matchArtistAlbumIndexTitle(input: Triple<String, String, String>): TrackMatch? =
         matchPattern(input,
                 listOf("^(.*)-##-(.*)-##-(\\d{2}). (.*).mp3",
                         "^(.*)-##-(.*)-##-(\\d{2}) (.*).mp3",
@@ -25,7 +27,7 @@ fun matchArtistAlbumIndexTitle(input: Triple<String, String, String>): Map<Field
                         FieldKey.TITLE to 4))
 
 // ex ~ somedir/VA - The Hidden City SR219 (2004) (v0)/05 Paul Bothen - Oh Lord.mp3
-fun matchArtistAlbumIndexTrackArtistTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
+fun matchArtistAlbumIndexTrackArtistTitle(input: Triple<String, String, String>): TrackMatch? =
         matchPattern(input,
                 listOf("^(.*)-##-(.*)-##-(\\d{2}). (.*)-(.*).mp3",
                         "^(.*)-##-(.*)-##-(\\d{2}) (.*)-(.*).mp3",
@@ -36,7 +38,7 @@ fun matchArtistAlbumIndexTrackArtistTitle(input: Triple<String, String, String>)
                         FieldKey.ARTIST to 4,
                         FieldKey.TITLE to 5))
 
-fun matchNoneArtistAlbumIndexTrackArtistTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
+fun matchNoneArtistAlbumIndexTrackArtistTitle(input: Triple<String, String, String>): TrackMatch? =
         matchPattern(input, listOf("^.*-##-(.*)-(.*)-##-(\\d{2}). (.*)-(.*).mp3",
                 "^.*-##-(.*)-(.*)-##-(\\d{2}) (.*)-(.*).mp3",
                 "^.*-##-(.*)-(.*)-##-(\\d{2})-(.*)-(.*).mp3"),
@@ -46,7 +48,7 @@ fun matchNoneArtistAlbumIndexTrackArtistTitle(input: Triple<String, String, Stri
                         FieldKey.ARTIST to 4,
                         FieldKey.TITLE to 5))
 
-fun matchNoneArtistAlbumDateIndexTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
+fun matchNoneArtistAlbumDateIndexTitle(input: Triple<String, String, String>): TrackMatch? =
         matchPattern(input, listOf(
                 "^.*-##-(.*)-(.*)-(.*)-##-(\\d{2}). (.*).mp3",
                 "^.*-##-(.*)-(.*)-(.*)-##-(\\d{2}) (.*).mp3",
@@ -56,7 +58,7 @@ fun matchNoneArtistAlbumDateIndexTitle(input: Triple<String, String, String>): M
                         FieldKey.TRACK to 4,
                         FieldKey.TITLE to 5))
 
-fun matchNoneArtistAlbumIndexTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
+fun matchNoneArtistAlbumIndexTitle(input: Triple<String, String, String>): TrackMatch? =
         matchPattern(input, listOf(
                 "^.*-##-(.*)-(.*)-##-(\\d{2}). (.*).mp3",
                 "^.*-##-(.*)-(.*)-##-(\\d{2}) (.*).mp3",
@@ -66,7 +68,7 @@ fun matchNoneArtistAlbumIndexTitle(input: Triple<String, String, String>): Map<F
                         FieldKey.TRACK to 3,
                         FieldKey.TITLE to 4))
 
-fun matchArtistAlbumDiscIndexTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
+fun matchArtistAlbumDiscIndexTitle(input: Triple<String, String, String>): TrackMatch? =
         matchPattern(input,
                 listOf("^(.*)-##-(.*)-##-(\\d)-(\\d{2}) (.*).mp3"),
                 listOf(FieldKey.ALBUM_ARTIST to 1,
@@ -76,7 +78,7 @@ fun matchArtistAlbumDiscIndexTitle(input: Triple<String, String, String>): Map<F
                         FieldKey.TITLE to 5))
 
 // Bob Marley - Complete Discography From 1967 To 2002 [33 Full Albums] (Mp3 256Kbps)/Bob Marley - 1979 - Live From Kingston/02 - Positive Vibration.mp3
-fun matchArtistYearAlbumTrackIndexTrackTitle(input: Triple<String, String, String>): Map<FieldKey, String>? =
+fun matchArtistYearAlbumTrackIndexTrackTitle(input: Triple<String, String, String>): TrackMatch? =
         matchPattern(input,
                 listOf("^(.*)-##-(.*)-(.*)-(.*)-##-(\\d{2}) -(.*).mp3"),
                 listOf(FieldKey.ARTIST to 2,
@@ -85,15 +87,15 @@ fun matchArtistYearAlbumTrackIndexTrackTitle(input: Triple<String, String, Strin
                         FieldKey.TRACK to 5,
                         FieldKey.TITLE to 6))
 
-private fun matchPattern(input: Triple<String, String, String>, regExpressions: List<String>, fieldKeyRegexGroupMapping: List<Pair<FieldKey, Int>>, filePathSeparator: String = "-##-"): Map<FieldKey, String>? {
-    require(regExpressions.isNotEmpty(), { "Must supply at least one regex." })
-    require(fieldKeyRegexGroupMapping.isNotEmpty(), { "Must supply at least one field mapping."} )
+private fun matchPattern(input: Triple<String, String, String>, regExpressions: List<String>, fieldKeyRegexGroupMapping: List<Pair<FieldKey, Int>>, filePathSeparator: String = "-##-"): TrackMatch? {
+    require(regExpressions.isNotEmpty()) { "Must supply at least one regex." }
+    require(fieldKeyRegexGroupMapping.isNotEmpty()) { "Must supply at least one field mapping." }
 
     regExpressions.forEach { regex ->
         val matchResult = regex.toRegex().find(input.toList().joinToString(separator = filePathSeparator))
 
         matchResult?.let { matchedGroups ->
-            val maxIndex = fieldKeyRegexGroupMapping.map(Pair<FieldKey, Int>::second).max()!! + 1
+            val maxIndex = fieldKeyRegexGroupMapping.asSequence().map(Pair<FieldKey, Int>::second).max()!! + 1
             if (matchedGroups.groupValues.size <= maxIndex) {
                 val tokens = matchedGroups.groupValues.map { it.trim() }
 
@@ -106,7 +108,7 @@ private fun matchPattern(input: Triple<String, String, String>, regExpressions: 
 }
 
 fun <T> List<T>.toTriple(): Triple<T, T, T> {
-    require(this.size == 3, { "List must have exactly 3 elements." })
+    require(this.size == 3) { "List must have exactly 3 elements." }
 
     return Triple(this[0], this[1], this[2])
 }

@@ -4,7 +4,7 @@ import org.jaudiotagger.tag.FieldKey
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-const val API_KEY = "API_KEY"
+const val API_KEY = "59c74f009a8cf08bcef859b322519290"
 
 class LastFmRankingTest {
 

@@ -2,7 +2,7 @@ package org.kgilmer.marconi.lastfm.model
 
 import com.beust.klaxon.Json
 
-data class TrackGetInfoResponse(val track: Track? = null)
+data class TrackGetInfoResponse(val track: Track)
 
 data class Track(
     val name: String,
@@ -16,7 +16,7 @@ data class Track(
     val toptags: Toptags
 )
 
-data class Toptags(val tag: List<Tag>? = null)
+data class Toptags(val tag: List<Tag>)
 
 data class Tag(
     val name: String,

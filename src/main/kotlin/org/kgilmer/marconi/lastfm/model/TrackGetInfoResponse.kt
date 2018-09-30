@@ -46,7 +46,7 @@ data class Image(
 
 data class Artist(
     val name: String,
-    val mbid: String,
+    val mbid: String? = null,
     val url: String
 )
 

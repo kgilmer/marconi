@@ -33,19 +33,18 @@ class LastFmRankingTest {
         val lastFmJson = """
 {
 	"track": {
-		"name": "The Wailers So Much Trouble In The World",
-		"url": "https://www.last.fm/music/Bob+Marley/_/The+Wailers+So+Much+Trouble+In+The+World",
+		"name": "Sur le pont DAvignon",
+		"url": "https://www.last.fm/music/Triocephale/_/Sur+le+pont+DAvignon",
 		"duration": "0",
 		"streamable": {
 			"#text": "0",
 			"fulltrack": "0"
 		},
-		"listeners": "18",
-		"playcount": "43",
+		"listeners": "1",
+		"playcount": "1",
 		"artist": {
-			"name": "Bob Marley",
-			"mbid": "ed2ac1e9-d51d-4eff-a2c2-85e81abd6360",
-			"url": "https://www.last.fm/music/Bob+Marley"
+			"name": "Triocephale",
+			"url": "https://www.last.fm/music/Triocephale"
 		},
 		"toptags": {
 			"tag": []

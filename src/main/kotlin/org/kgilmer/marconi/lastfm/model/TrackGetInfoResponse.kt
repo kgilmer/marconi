@@ -12,7 +12,7 @@ data class Track(
     val listeners: String,
     val playcount: String,
     val artist: Artist,
-    val album: Album?,
+    val album: Album? = null,
     val toptags: Toptags
 )
 

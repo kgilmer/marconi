@@ -1,8 +1,17 @@
 package org.kgilmer.marconi.lastfm.model
 
 import com.beust.klaxon.Json
+import org.jaudiotagger.tag.FieldKey
 
-data class TrackGetInfoResponse(val track: Track)
+data class TrackGetInfoResponse(val track: Track) {
+    fun toTrackMatch(): Map<FieldKey, String> =
+        mapOf(
+            FieldKey.ARTIST to track.artist.name,
+            FieldKey.ALBUM to (track.album?.title ?: ""),
+            FieldKey.TITLE to track.name,
+            FieldKey.GENRE to (track.toptags.tag.firstOrNull()?.name ?: "")
+        )
+}
 
 data class Track(
     val name: String,
